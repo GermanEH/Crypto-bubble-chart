@@ -11,10 +11,13 @@ const BubbleChart:React.FC = () => {
 
   const svgRef = useRef<SVGSVGElement | null>(null)
 
-  const innerWidth = window.innerWidth
+  const innerWidth = window.innerWidth - 296
   console.log(innerWidth)
   const width = innerWidth
-  const height = 381
+  const parentHeight = svgRef?.current?.parentElement?.clientHeight ?? 0;
+  console.log(parentHeight)
+
+  const height = parentHeight
 
   useEffect(() => {
     
@@ -32,12 +35,14 @@ const BubbleChart:React.FC = () => {
             
       if(!svgRef.current) return
       const svg = d3.select(svgRef.current)
-      .attr("width", width)
-      .attr("height", height)
+
+
+      svg.attr("width", width)
+      .attr("height", parentHeight)
       svg.selectAll("*").remove();
       
     const colorRange = ["url(#negativeGradient)", 'url(#positiveGradient'];
-    let color = d3.scaleOrdinal()
+    const color = d3.scaleOrdinal()
       .domain(["negative", "positive"])
       .range(colorRange);
   
@@ -45,12 +50,12 @@ const BubbleChart:React.FC = () => {
       const minPriceChangePercentage = d3.min(coins, d => d.priceChangePercentage);
       const maxPriceChangePercentage = d3.max(coins, d => d.priceChangePercentage);
 
-    let size = d3.scaleLinear()
+    const size = d3.scaleLinear()
       .domain([minPriceChangePercentage, maxPriceChangePercentage])
-      .range([30,100]) 
+      .range([20,125]) 
 
 
-    let node = svg.append("g")
+    const node = svg.append("g")
       .selectAll("g")
       .data(coins)
       .enter()
@@ -147,7 +152,7 @@ const BubbleChart:React.FC = () => {
 
 const radius = (d) => size(d.priceChangePercentage) + 3
 // Features of the forces applied to the nodes:
-let simulation = d3.forceSimulation()
+const simulation = d3.forceSimulation()
     .force("center", d3.forceCenter().x(width / 2).y(height / 2))
     .force("charge", d3.forceManyBody().strength(.1)) 
     .force("collide", d3.forceCollide().strength(.2)
@@ -200,22 +205,22 @@ simulation
   const filters = ['1 hour', '24 Hours', '7 Days', '30 Days', '1 Year']
   return (
     <>
-    <div className="w-[80%] h-screen">
+    <main className="w-[calc(100%-280px)] h-screen bg-[#06111d]">
       <SearchBar />
-      <div className="h-[88%] bg-[#06111d]">
-        <div className="h-[10%] flex justify-center pt-4">
+      <div className="h-[8%]">
+        <div className="h-[6%] flex justify-center pt-4">
           {filters.map(filter => 
             <button key={filter} className={`bg-[#0D2035] text-xs px-2 h-7 px-2 ${filter === '1 hour' ? 'rounded-l-md' : filter === '1 Year' ? 'rounded-r-md' : ''}`}><span className="text-[#2E628E]">
               {filter}
               </span>
             </button>)}
         </div>
+      </div>
         <div className="h-[80%] pt-4 pb-16 px-2">
           <svg ref={svgRef}></svg>
           <div className="w-full h-12"></div>
         </div>
-      </div>
-    </div>
+    </main>
     </>
 )
 }
