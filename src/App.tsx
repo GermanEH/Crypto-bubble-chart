@@ -6,7 +6,7 @@ import NavBar from './components/containers/NavBar.jsx'
 
 const App:React.FC = () => {
   return (
-    <div className="p-0 m-0 w-screen h-screen flex">
+    <div className="p-0 m-0 w-screen h-screen flex bg-[#0D2035]">
       <NavBar />
       <Routes>
         <Route path="/coin/detail/:id" element={<CoinDetail/>}/>
