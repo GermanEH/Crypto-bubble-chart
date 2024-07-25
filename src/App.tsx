@@ -1,8 +1,8 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import BubbleChart from './pages/BubbleChart/BubbleChart'
 import CoinDetail from './pages/CoinDetail/CoinDetail'
-import NotFound from './modules/core/components/containers/NotFound.js';
-import NavBar from './modules/core/components/containers/NavBar.js'
+import NotFound from './modules/core/components/NotFound.js';
+import NavBar from './modules/core/components/NavBar.js'
 
 const App:React.FC = () => {
   return (

@@ -5,9 +5,16 @@ import * as d3 from 'd3'
 import axios from 'axios'
 import {Link} from 'react-router-dom'
 import SearchBar from '../../modules/core/components/SearchBar.tsx'
-
-
+import { createPublicClient, http } from 'viem'
+import { mainnet } from 'viem/chains'
+ 
 const BubbleChart:React.FC = () => {
+  // 2. Set up your client with desired chain & transport.
+  const client = createPublicClient({
+    chain: mainnet,
+    transport: http(),
+  })
+   
 
   const svgRef = useRef<SVGSVGElement | null>(null)
 
@@ -32,16 +39,20 @@ const BubbleChart:React.FC = () => {
     priceChangePercentage:number
     priceChange:string
   }
-  interface Node extends Price {
-    fx:number | null 
-    fy:number | null
-    x:number 
-    y:number
-  }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const isPrice = (obj: any): obj is Price  => 'x' in obj && 'y' in obj && 'priceChangePercentage' in obj
+
   useEffect(() => {
-    
+    const getBlocks = async() => {
+        // 3. Consume an action!
+        const blockNumber = await client.getBlockNumber()
+        console.log(blockNumber)
+    }
+    getBlocks()
+
     const getCoins = async () => {
-      const response = await axios.get('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=50&page=1&sparkline=false&locale=en')
+      const response = await axios.get('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=50&page=1&sparkline=false&locale=en&apiKey=CG-QbZkDScotX6kxauUGJRokS12')
       const prices:Price[] = response.data.map((coin:Coin) => ({id: coin.id, symbol: coin.symbol, 
         image: coin.image, priceChangePercentage: coin.price_change_percentage_24h, priceChange: coin.price_change_percentage_24h > 0 ? 'positive' : 'negative'})
       )
@@ -87,11 +98,11 @@ const BubbleChart:React.FC = () => {
       
       node.append('circle')
       .attr("r", d => size(d.priceChangePercentage))
-      // .style("fill", d => color(d.priceChange))
+      .style("fill", (d) => { if(isPrice(d)) {return color(d.priceChange) as string }else return 0})
       .style("fill-opacity", 0.8)
       .attr("stroke", "black")
       .style("stroke-width", 1)
-      .call(d3.drag()
+      .call(d3.drag<SVGCircleElement, Price>()
       .on("start", dragstarted)
       .on("drag", dragged)
       .on("end", dragended))
@@ -107,8 +118,8 @@ const BubbleChart:React.FC = () => {
 
     node.append("image")
       .attr("xlink:href", d => d.image)
-      .attr("x", d => d.x )
-      .attr("y", d => d.y )
+      .attr("x", d => d.x as number )
+      .attr("y", d => d.y as number)
       .attr("width", d => size(d.priceChangePercentage)) 
       .attr("height", d => size(d.priceChangePercentage))
       .attr("clip-path", "url(#clipCircle)")
@@ -173,43 +184,46 @@ const BubbleChart:React.FC = () => {
 
       
 
-const radius = (d) => size(d.priceChangePercentage) + 3
+const radius = (d:Price) => size(d.priceChangePercentage) + 3
 // Features of the forces applied to the nodes:
 const simulation = d3.forceSimulation()
     .force("center", d3.forceCenter().x(width / 2).y(height / 2))
     .force("charge", d3.forceManyBody().strength(.1)) 
     .force("collide", d3.forceCollide().strength(.2)
-    .radius((d) => radius(d)).iterations(1)) // Force that avoids circle overlapping
+    // .radius((d) => radius(d))
+    .radius((d) => radius(d as Price))
+    .iterations(1)) // Force that avoids circle overlapping
+
 
 // Apply these forces to the nodes and update their positions.
 // Once the force algorithm is happy with positions ('alpha' value is low enough), simulations will stop.
 simulation
-    .nodes(coins)
-    .on("tick", function() {
+    .nodes(coins as Price[])
+    .on("tick", () => {
       node.selectAll("circle")
-          .attr("cx", function(d:Node) { return d.x = Math.max(radius(d), Math.min(width - radius(d), d.x)) })
-          .attr("cy", function(d) { return d.y = Math.max(radius(d), Math.min(height - radius(d), d.y)) });
+          .attr("cx", (d) => {if(isPrice(d)) {return d.x = Math.max(radius(d), Math.min(width - radius(d), d.x as number))} else return 0})
+          .attr("cy", (d) => {if(isPrice(d)) { return d.y = Math.max(radius(d as Price), Math.min(height - radius(d as Price), d.y as number)) }else return 0});
       node.selectAll("image")
-          .attr("x", function(d) { return d.x - 25})
-          .attr("y", function(d) { return d.y - size(d.priceChangePercentage)});
+          .attr("x", (d) => {if(isPrice(d)) { return d.x as number - 25} else return 0})
+          .attr("y", (d) => {if(isPrice(d)) { return d.y as number - size(d.priceChangePercentage)} else return 0});
       node.selectAll("text")
-          .attr("x", function(d) { return d.x; })
-          .attr("y", function(d) { return d.y + 20});
+          .attr("x", (d) => {if(isPrice(d)) { return d.x as number } else return 0})
+          .attr("y", (d) => {if(isPrice(d)) { return d.y as number + 20} else return 0})
     });
 
 
-  function dragstarted(event:d3.D3DragEvent<SVGCircleElement, Price, SVGGElement>, d:Node) {
+  function dragstarted(event:d3.D3DragEvent<SVGCircleElement, Price, SVGGElement>, d:Price) {
     if (!event.active) simulation.alphaTarget(.03).restart();
     d.fx = d.x;
     d.fy = d.y;
   }
-  function dragged(event:d3.D3DragEvent<SVGCircleElement, Price, SVGGElement>, d:Node) {
+  function dragged(event:d3.D3DragEvent<SVGCircleElement, Price, SVGGElement>, d:Price) {
     d.fx = event.x > width ? width : event.x;
     d.fy = event.y > width ? width : event.y;
     // d.fx = Math.min(size(d.priceChangePercentage), Math.max(width - size(d.priceChangePercentage), d.fx));
     //  d.fy = Math.min(size(d.priceChangePercentage), Math.max(height - size(d.priceChangePercentage), d.fy));
   }
-  function dragended(event:d3.D3DragEvent<SVGCircleElement, Price, SVGGElement>, d:Node) {
+  function dragended(event:d3.D3DragEvent<SVGCircleElement, Price, SVGGElement>, d:Price) {
     if (!event.active) simulation.alphaTarget(.03);
     d.fx = null;
     d.fy = null;
@@ -220,9 +234,8 @@ simulation
 
   }, [])
 
-  const handleClick = (event, d) => {
+  const handleClick = (d:Price) => {
     return <Link to={`/coin/${d.id}`} />
-
   }
   
   const filters = ['1 hour', '24 Hours', '7 Days', '30 Days', '1 Year']

@@ -1,6 +1,6 @@
 import {Link} from 'react-router-dom'
-import Logomark from '../../assets/images/MoralisMoneyLogomark.5b65b0d7.svg'
-import Logotype from '../../assets/images/MoralisMoneyLogotype.431faf8b.svg'
+import Logomark from '../../../assets/images/MoralisMoneyLogomark.5b65b0d7.svg'
+import Logotype from '../../../assets/images/MoralisMoneyLogotype.431faf8b.svg'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faBook, faChartLine, faBookOpenReader, faCoins, faGear, faCode, faChevronLeft } from '@fortawesome/free-solid-svg-icons'
 import { faHeart } from '@fortawesome/free-regular-svg-icons'
@@ -59,7 +59,7 @@ const NavBar:React.FC = () => {
           <div>
             <div className="flex flex-col gap-3 px-4 pb-4">
               <button className="flex justify-center items-center px-4 border border-[#2e628e] text-[#85b3db] w-full h-12 rounded-lg border-2 gap-2">
-              <svg aria-hidden="true" focusable="false" data-prefix="far" data-icon="arrow-right" class="svg-inline--fa fa-arrow-right " role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path fill="currentColor" d="M440.6 273.4c4.7-4.5 7.4-10.8 7.4-17.4s-2.7-12.8-7.4-17.4l-176-168c-9.6-9.2-24.8-8.8-33.9 .8s-8.8 24.8 .8 33.9L364.1 232 24 232c-13.3 0-24 10.7-24 24s10.7 24 24 24l340.1 0L231.4 406.6c-9.6 9.2-9.9 24.3-.8 33.9s24.3 9.9 33.9 .8l176-168z"></path></svg>
+              {/* <svg aria-hidden="true" focusable="false" data-prefix="far" data-icon="arrow-right" class="svg-inline--fa fa-arrow-right " role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path fill="currentColor" d="M440.6 273.4c4.7-4.5 7.4-10.8 7.4-17.4s-2.7-12.8-7.4-17.4l-176-168c-9.6-9.2-24.8-8.8-33.9 .8s-8.8 24.8 .8 33.9L364.1 232 24 232c-13.3 0-24 10.7-24 24s10.7 24 24 24l340.1 0L231.4 406.6c-9.6 9.2-9.9 24.3-.8 33.9s24.3 9.9 33.9 .8l176-168z"></path></svg> */}
                 Start Trial
               </button>
             </div>
