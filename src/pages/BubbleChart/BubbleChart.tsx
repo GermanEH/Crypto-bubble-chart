@@ -5,24 +5,15 @@ import * as d3 from 'd3'
 import axios from 'axios'
 import {Link} from 'react-router-dom'
 import SearchBar from '../../modules/core/components/SearchBar.tsx'
-import { createPublicClient, http } from 'viem'
-import { mainnet } from 'viem/chains'
  
 const BubbleChart:React.FC = () => {
-  // 2. Set up your client with desired chain & transport.
-  const client = createPublicClient({
-    chain: mainnet,
-    transport: http(),
-  })
-   
+
 
   const svgRef = useRef<SVGSVGElement | null>(null)
 
   const innerWidth = window.innerWidth - 296
-  console.log(innerWidth)
   const width = innerWidth
   const parentHeight = svgRef?.current?.parentElement?.clientHeight ?? 0;
-  console.log(parentHeight)
 
   const height = parentHeight
 
@@ -44,12 +35,6 @@ const BubbleChart:React.FC = () => {
     const isPrice = (obj: any): obj is Price  => 'x' in obj && 'y' in obj && 'priceChangePercentage' in obj
 
   useEffect(() => {
-    const getBlocks = async() => {
-        // 3. Consume an action!
-        const blockNumber = await client.getBlockNumber()
-        console.log(blockNumber)
-    }
-    getBlocks()
 
     const getCoins = async () => {
       const response = await axios.get('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=50&page=1&sparkline=false&locale=en&apiKey=CG-QbZkDScotX6kxauUGJRokS12')

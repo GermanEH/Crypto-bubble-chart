@@ -22,7 +22,8 @@
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.22.3",
     "tailwind": "^4.0.0",
-    "viem": "^2.17.11"
+    "viem": "^2.17.11",
+    "zustand": "^4.5.4"
   },
   "devDependencies": {
     "@types/d3": "^7.4.3",
